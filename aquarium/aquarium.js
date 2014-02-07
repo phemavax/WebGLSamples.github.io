@@ -30,6 +30,12 @@ var g_scenes = {};  // each of the models
 var g_sceneGroups = {};  // the placement of the models
 var g_fog = true;
 var g_requestId;
+var secondsBeforeStartMeasure = 4.0;
+var startupTimeElapsed = false;
+var minMeasuredFPS = 100000000.0;
+var maxMeasuredFPS = 0.0;
+
+
 
 //g_debug = true;
 //g_drawOnce = true;
@@ -893,6 +899,9 @@ function initialize() {
   var then = 0.0;
   var clock = 0.0;
   var fpsElem = document.getElementById("fps");
+  var avgFpsElem = document.getElementById("avgFps");
+  var minFpsElem = document.getElementById("minFps");
+  var maxFpsElem = document.getElementById("maxFps");
 
   var projection = new Float32Array(16);
   var view = new Float32Array(16);
@@ -1072,6 +1081,8 @@ function initialize() {
   var setPretty = true;
 
   var theClock = tdl.clock.createClock(g.net.sync ? 10 : undefined);
+  var startTime = theClock.getTime();
+  
   var now = theClock.getTime();
   if (g.net.sync) {
     clock = now;
@@ -1128,40 +1139,69 @@ function initialize() {
   function render() {
     var now = theClock.getTime();
     var elapsedTime;
+    var runningTime;
+    var instFPS;
+
     if(then == 0.0) {
       elapsedTime = 0.0;
     } else {
       elapsedTime = now - then;
     }
-    then = now;
-
-    frameCount++;
 
     g_fpsTimer.update(elapsedTime);
-    fpsElem.innerHTML = g_fpsTimer.averageFPS;
-
-    // If we are running > 40hz then turn on a few more options.
-    if (setPretty && g_fpsTimer.averageFPS > 40) {
-      setPretty = false;
-      if (!g.options.normalMaps.enabled) { g.options.normalMaps.toggle(); }
-      if (!g.options.reflection.enabled) { g.options.reflection.toggle(); }
-    }
-
-    // See if we should increase/decrease the rendering resolution
-    checkResTimer -= elapsedTime;
-    if (checkResTimer < 0) {
-      if (g.win && g.win.adjustRes) {
-        if (g_fpsTimer.averageFPS > 35) {
-          if (increaseCanvasSize(canvas)) {
-            checkResTimer = 2;
-          }
-        } else if (g_fpsTimer.averageFPS < 15) {
-          if (decreaseCanvasSize(canvas)) {
-            checkResTimer = 2;
-          }
+    
+    then = now;
+    runningTime = now - startTime;
+    instFPS = g_fpsTimer.instantaneousFPS;
+    frameCount++;
+    
+    if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
+        runningTime = 0.0;
+    }else{
+        if(!startupTimeElapsed){
+            startupTimeElapsed = true;
+            startTime = theClock.getTime();
+            frameCount = 0;
+            minMeasuredFPS = 100000000.0;
+            maxMeasuredFPS = 0.0;
         }
-      }
     }
+
+    if(instFPS < minMeasuredFPS){
+      minMeasuredFPS = instFPS;
+    }
+
+    if(instFPS > maxMeasuredFPS){
+      maxMeasuredFPS = instFPS;
+    }
+
+    fpsElem.innerHTML = instFPS;
+    avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
+    minFpsElem.innerHTML = minMeasuredFPS;
+    maxFpsElem.innerHTML = maxMeasuredFPS;
+
+//    // If we are running > 40hz then turn on a few more options.
+//    if (setPretty && g_fpsTimer.averageFPS > 40) {
+//      setPretty = false;
+//      if (!g.options.normalMaps.enabled) { g.options.normalMaps.toggle(); }
+//      if (!g.options.reflection.enabled) { g.options.reflection.toggle(); }
+//    }
+// 
+//    // See if we should increase/decrease the rendering resolution
+//    checkResTimer -= elapsedTime;
+//    if (checkResTimer < 0) {
+//      if (g.win && g.win.adjustRes) {
+//        if (g_fpsTimer.averageFPS > 35) {
+//          if (increaseCanvasSize(canvas)) {
+//            checkResTimer = 2;
+//          }
+//        } else if (g_fpsTimer.averageFPS < 15) {
+//          if (decreaseCanvasSize(canvas)) {
+//            checkResTimer = 2;
+//          }
+//        }
+//      }
+//    }
 
     if (g.net.sync) {
       clock = now * g.globals.speed;
