@@ -67,7 +67,23 @@ CANVAS {
   color: gray;
   background-color: rgba(0,0,0,0.5);
   border-radius: 10px;
-  padding: 10px;
+  padding: 5px;
+}
+.fpsContainerBlock {
+  /*top: 3px;
+  bottom: 3px;*/
+  padding: 5px;
+}
+.benchmark{
+  color: red;
+  font-size: medium;
+/*  border-bottom-color: rgba(0,0,0,0.5);
+  border-bottom-style: solid;
+  border-bottom-width: 1px;*/
+/*  background-color: rgba(0,0,0,0.5);
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;*/
 }
 .fps {
   color: white;
@@ -116,10 +132,16 @@ CANVAS {
 <body>
 <div id="info"><a href="http://threedlibrary.googlecode.com" target="_blank">tdl.js</a> - aquarium</div>
 <div class="fpsContainer">
-  <div class="fps">instantaneous fps: <span id="fps"></div>
+  <div class="fpsContainerBlock">
+  <div class="benchmark"><span id="benchMessage"></div>
+  </div>
+  <div class="fpsContainerBlock">
   <div class="fps">average fps: <span id="avgFps"></div>
-  <div class="fps">min fps: <span id="minFps"></div>
+  <div class="fps">inst. fps: <span id="fps"></div>
   <div class="fps">max fps: <span id="maxFps"></div>
+  <div class="fps">min fps: <span id="minFps"></div>
+  </div>
+  <div class="fpsContainerBlock">
   <div id="topUI">
   <div>Number of Fish</div>
   <div class="clickable" id="setSetting0">1</div>
@@ -133,6 +155,7 @@ CANVAS {
   <span style="float: right" class="clickable" id="setSetting8">*</span></div>
   <div class="clickable" id="options">Options...
   <div id="optionsContainer">
+  </div>
   </div>
   </div>
   </div>

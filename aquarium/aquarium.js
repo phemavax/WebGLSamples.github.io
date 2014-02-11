@@ -30,12 +30,13 @@ var g_scenes = {};  // each of the models
 var g_sceneGroups = {};  // the placement of the models
 var g_fog = true;
 var g_requestId;
-var secondsBeforeStartMeasure = 4.0;
+
+var benchmarkMessageStarting = "Benchmark starts in: ";
+var benchmarkMessageRunning = "Running Benchmark";
+var secondsBeforeStartMeasure = 5.0;
 var startupTimeElapsed = false;
 var minMeasuredFPS = 100000000.0;
 var maxMeasuredFPS = 0.0;
-
-
 
 //g_debug = true;
 //g_drawOnce = true;
@@ -902,6 +903,7 @@ function initialize() {
   var avgFpsElem = document.getElementById("avgFps");
   var minFpsElem = document.getElementById("minFps");
   var maxFpsElem = document.getElementById("maxFps");
+  var benchMessage = document.getElementById("benchMessage");
 
   var projection = new Float32Array(16);
   var view = new Float32Array(16);
@@ -1154,31 +1156,37 @@ function initialize() {
     runningTime = now - startTime;
     instFPS = g_fpsTimer.instantaneousFPS;
     frameCount++;
-    
+
     if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
-        runningTime = 0.0;
+      benchMessage.innerHTML = benchmarkMessageStarting;
+      benchMessage.innerHTML += Math.ceil(secondsBeforeStartMeasure - runningTime);
+      avgFpsElem.innerHTML = "--";
+      minFpsElem.innerHTML = "--";
+      maxFpsElem.innerHTML = "--";
     }else{
-        if(!startupTimeElapsed){
-            startupTimeElapsed = true;
-            startTime = theClock.getTime();
-            frameCount = 0;
-            minMeasuredFPS = 100000000.0;
-            maxMeasuredFPS = 0.0;
-        }
-    }
+      if(!startupTimeElapsed){
+          startupTimeElapsed = true;
+          startTime = theClock.getTime();
+          frameCount = 0;
+          minMeasuredFPS = 100000000.0;
+          maxMeasuredFPS = 0.0;
+          benchMessage.innerHTML = benchmarkMessageRunning;
+      }
 
-    if(instFPS < minMeasuredFPS){
-      minMeasuredFPS = instFPS;
-    }
-
-    if(instFPS > maxMeasuredFPS){
-      maxMeasuredFPS = instFPS;
+      if(instFPS < minMeasuredFPS){
+        minMeasuredFPS = instFPS;
+      }
+  
+      if(instFPS > maxMeasuredFPS){
+          maxMeasuredFPS = instFPS;
+      }
+      
+      avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
+      minFpsElem.innerHTML = minMeasuredFPS;
+      maxFpsElem.innerHTML = maxMeasuredFPS;
     }
 
     fpsElem.innerHTML = instFPS;
-    avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
-    minFpsElem.innerHTML = minMeasuredFPS;
-    maxFpsElem.innerHTML = maxMeasuredFPS;
 
 //    // If we are running > 40hz then turn on a few more options.
 //    if (setPretty && g_fpsTimer.averageFPS > 40) {
