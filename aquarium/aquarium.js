@@ -1113,36 +1113,45 @@ function initialize() {
     return changed;
   }
 
-  function increaseCanvasSize(canvas) {
-//tdl.log(canvas.width, canvas.clientWidth, canvas.width / canvas.clientWidth);
-//tdl.log(canvas.height, canvas.clientHeight, canvas.height / canvas.clientHeight);
-    var newWidth = Math.min(maxViewportDims[0],
-        canvas.width * ((canvas.clientWidth / canvas.width > 1.2) ? 2 : 1));
-    var newHeight = Math.min(maxViewportDims[1],
-        canvas.height * ((canvas.clientHeight / canvas.height > 1.2) ? 2 : 1));
-    return setCanvasSize(canvas, newWidth, newHeight);
-  }
+//   function increaseCanvasSize(canvas) {
+// //tdl.log(canvas.width, canvas.clientWidth, canvas.width / canvas.clientWidth);
+// //tdl.log(canvas.height, canvas.clientHeight, canvas.height / canvas.clientHeight);
+//     var newWidth = Math.min(maxViewportDims[0],
+//         canvas.width * ((canvas.clientWidth / canvas.width > 1.2) ? 2 : 1));
+//     var newHeight = Math.min(maxViewportDims[1],
+//         canvas.height * ((canvas.clientHeight / canvas.height > 1.2) ? 2 : 1));
+//     return setCanvasSize(canvas, newWidth, newHeight);
+//   }
 
-  function decreaseCanvasSize(canvas) {
-    var newWidth = Math.max(512,
-        canvas.width * ((canvas.clientWidth / canvas.width < 0.5) ? 0.5 : 1));
-    var newHeight = Math.max(512,
-        canvas.height * ((canvas.clientHeight / canvas.height < 0.5) ? 0.5 :
-                         1));
-    return setCanvasSize(canvas, newWidth, newHeight);
-  }
+//   function decreaseCanvasSize(canvas) {
+//     var newWidth = Math.max(512,
+//         canvas.width * ((canvas.clientWidth / canvas.width < 0.5) ? 0.5 : 1));
+//     var newHeight = Math.max(512,
+//         canvas.height * ((canvas.clientHeight / canvas.height < 0.5) ? 0.5 :
+//                          1));
+//     return setCanvasSize(canvas, newWidth, newHeight);
+//   }
 
-  var checkResTimer = 2;
+//   var checkResTimer = 2;
 
-  if (g.globals.width && g.globals.height) {
-    setCanvasSize(canvas, g.globals.width, g.globals.height);
-  }
+//   if (g.globals.width && g.globals.height) {
+//     setCanvasSize(canvas, g.globals.width, g.globals.height);
+//   }
 
   function render() {
     var now = theClock.getTime();
     var elapsedTime;
     var runningTime;
     var instFPS;
+
+     canvas.width = canvas.clientWidth;
+     canvas.height = canvas.clientHeight;
+//      canvas.width = 320;
+//      canvas.height = 320;
+//     canvas.width  = 1024;
+//     canvas.height = 1024; 
+    canvas.style.width  = '100%';
+    canvas.style.height = '100%';
 
     if(then == 0.0) {
       elapsedTime = 0.0;
@@ -1188,6 +1197,7 @@ function initialize() {
 
     fpsElem.innerHTML = instFPS;
 
+//    // Disabled below code to be able to run reproducible benchmarks
 //    // If we are running > 40hz then turn on a few more options.
 //    if (setPretty && g_fpsTimer.averageFPS > 40) {
 //      setPretty = false;
@@ -1210,6 +1220,10 @@ function initialize() {
 //        }
 //      }
 //    }
+
+    if(frameCount % 300 == 0){
+      console.debug(canvas.width + ' ' + canvas.height);
+    }
 
     if (g.net.sync) {
       clock = now * g.globals.speed;
@@ -1663,7 +1677,7 @@ function initialize() {
       g_requestId = tdl.webgl.requestAnimationFrame(render, canvas);
     }
   }
-  render();
+ render();
   return true;
 }
 
