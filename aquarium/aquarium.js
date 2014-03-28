@@ -33,10 +33,24 @@ var g_requestId;
 
 var benchmarkMessageStarting = "Benchmark starts in: ";
 var benchmarkMessageRunning = "Running Benchmark";
+var benchmarkMessageFinished = "Benchmark Finished";
 var secondsBeforeStartMeasure = 5.0;
+var benchmarkRunTime = -1;
 var startupTimeElapsed = false;
 var minMeasuredFPS = 100000000.0;
 var maxMeasuredFPS = 0.0;
+var lockCanvasSizeToScreen = false;
+var benchmarkIsRunning = true;
+
+// URL arguments
+// Use: http://localhost/aquarium/aquarium.html?lockRes=false&width=1024&height=720&startWait=3&runFor=10
+var lockRes = "lockRes";
+var resWidth = "width";
+var resHeight = "height";
+var startWait = "startWait";
+var benchRunTime = "runFor";
+var numFish = "numFish";
+var featureFlags = "featureFlags";
 
 //g_debug = true;
 //g_drawOnce = true;
@@ -607,7 +621,6 @@ function setShaders() {
   }
 }
 
-
 function loadScene(name, opt_programIds, fog) {
   var scene = new Scene(opt_programIds, fog);
   scene.load("assets/" + name + ".js");
@@ -829,6 +842,65 @@ function setupCountButtons() {
   setSetting(document.getElementById("setSetting7"), 7);
 }
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function setUpParameters(){
+  function isNumber(n) {
+    return !isNaN(parseInt(n)) && isFinite(n) && n > 0;
+  }
+  
+  function checkFlags(n) {
+    return false;
+  }
+  
+  var lock = getParameterByName(lockRes);
+  if(lock == "true"){
+    lockCanvasSizeToScreen = true;
+    Log("Locking render resolution to page element size");
+  }
+ 
+  var width = getParameterByName(resWidth);
+  if(isNumber(width)){
+    canvas.width = parseInt(width);
+    Log("Setting render width to " + width);
+  }
+  
+  var height = getParameterByName(resHeight);
+  if(isNumber(height)){
+    canvas.height = parseInt(height);
+    Log("Setting render height to " + height);
+  }
+  
+  var delay = getParameterByName(startWait);
+  if(isNumber(delay)){
+    secondsBeforeStartMeasure = parseInt(delay);
+    Log("Setting benchmark start delay to " + delay + " seconds");
+  }
+  
+  var dur = getParameterByName(benchRunTime);
+  if(isNumber(dur)){
+    benchmarkRunTime = parseFloat(dur);
+    Log("Setting benchmark runtime to " + dur + " seconds");
+  }
+  
+  var fish = getParameterByName(numFish);
+  if(isNumber(fish)){
+    // TODO set number of fish;
+    Log("Setting number of fish to " + fish);
+  }
+  
+  var params = getParameterByName(numFish);
+  if(checkFlags(params)){
+    // TODO set flags;
+    Log("Setting number of fish to " + fish);
+  }
+}
+
 /**
  * Initializes stuff.
  */
@@ -836,6 +908,8 @@ function main() {
   math = tdl.math;
   fast = tdl.fast;
   canvas = document.getElementById("canvas");
+  
+  setUpParameters();
 
   //canvas = WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas);
   // tell the simulator when to lose context.
@@ -904,6 +978,8 @@ function initialize() {
   var minFpsElem = document.getElementById("minFps");
   var maxFpsElem = document.getElementById("maxFps");
   var benchMessage = document.getElementById("benchMessage");
+  var canWidthElem = document.getElementById("canWidth");
+  var canHeightElem = document.getElementById("canHeight");
 
   var projection = new Float32Array(16);
   var view = new Float32Array(16);
@@ -1090,6 +1166,9 @@ function initialize() {
     clock = now;
     eyeClock = now;
   }
+  
+  canWidthElem.innerHTML = canvas.width;
+  canHeightElem.innerHTML = canvas.height; 
 
   function setCanvasSize(canvas, newWidth, newHeight) {
     var changed = false;
@@ -1109,28 +1188,13 @@ function initialize() {
     if (changed) {
       //tdl.log("drawingBufferDimensions:" + gl.drawingBufferWidth + ", " + gl.drawingBufferHeight);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      
+      canWidthElem.innerHTML = canvas.width;
+      canHeightElem.innerHTML = canvas.height; 
     }
+
     return changed;
   }
-
-//   function increaseCanvasSize(canvas) {
-// //tdl.log(canvas.width, canvas.clientWidth, canvas.width / canvas.clientWidth);
-// //tdl.log(canvas.height, canvas.clientHeight, canvas.height / canvas.clientHeight);
-//     var newWidth = Math.min(maxViewportDims[0],
-//         canvas.width * ((canvas.clientWidth / canvas.width > 1.2) ? 2 : 1));
-//     var newHeight = Math.min(maxViewportDims[1],
-//         canvas.height * ((canvas.clientHeight / canvas.height > 1.2) ? 2 : 1));
-//     return setCanvasSize(canvas, newWidth, newHeight);
-//   }
-
-//   function decreaseCanvasSize(canvas) {
-//     var newWidth = Math.max(512,
-//         canvas.width * ((canvas.clientWidth / canvas.width < 0.5) ? 0.5 : 1));
-//     var newHeight = Math.max(512,
-//         canvas.height * ((canvas.clientHeight / canvas.height < 0.5) ? 0.5 :
-//                          1));
-//     return setCanvasSize(canvas, newWidth, newHeight);
-//   }
 
 //   var checkResTimer = 2;
 
@@ -1144,15 +1208,10 @@ function initialize() {
     var runningTime;
     var instFPS;
 
-     canvas.width = canvas.clientWidth;
-     canvas.height = canvas.clientHeight;
-//      canvas.width = 320;
-//      canvas.height = 320;
-//     canvas.width  = 1024;
-//     canvas.height = 1024; 
-    canvas.style.width  = '100%';
-    canvas.style.height = '100%';
-
+    if(lockCanvasSizeToScreen){
+      setCanvasSize(canvas, canvas.clientWidth, canvas.clientHeight);  
+    }
+    
     if(then == 0.0) {
       elapsedTime = 0.0;
     } else {
@@ -1165,64 +1224,55 @@ function initialize() {
     runningTime = now - startTime;
     instFPS = g_fpsTimer.instantaneousFPS;
     frameCount++;
-
-    if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
-      benchMessage.innerHTML = benchmarkMessageStarting;
-      benchMessage.innerHTML += Math.ceil(secondsBeforeStartMeasure - runningTime);
-      avgFpsElem.innerHTML = "--";
-      minFpsElem.innerHTML = "--";
-      maxFpsElem.innerHTML = "--";
-    }else{
-      if(!startupTimeElapsed){
+    
+    if(benchmarkIsRunning){
+      if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
+        benchMessage.innerHTML = benchmarkMessageStarting;
+        benchMessage.innerHTML += Math.ceil(secondsBeforeStartMeasure - runningTime);
+        avgFpsElem.innerHTML = "--";
+        minFpsElem.innerHTML = "--";
+        maxFpsElem.innerHTML = "--";
+      }else{
+        if(startupTimeElapsed){
+          if(benchmarkRunTime > 0 ){
+            if(benchmarkRunTime > runningTime){
+              benchMessage.innerHTML = benchmarkMessageRunning + ": " + Math.floor(benchmarkRunTime - runningTime + 1);
+            } else {
+              benchmarkIsRunning = false;
+              benchMessage.innerHTML = benchmarkMessageFinished;
+            } 
+          }
+        } else {
           startupTimeElapsed = true;
           startTime = theClock.getTime();
           frameCount = 0;
           minMeasuredFPS = 100000000.0;
           maxMeasuredFPS = 0.0;
-          benchMessage.innerHTML = benchmarkMessageRunning;
-      }
+          
+          if(benchmarkRunTime > 0 ){
+            benchMessage.innerHTML = benchmarkMessageRunning + ": " + benchmarkRunTime;
+          } else {
+            benchMessage.innerHTML = benchmarkMessageRunning;
+          }
+        }
 
-      if(instFPS < minMeasuredFPS){
-        minMeasuredFPS = instFPS;
-      }
-  
-      if(instFPS > maxMeasuredFPS){
-          maxMeasuredFPS = instFPS;
+        if(instFPS < minMeasuredFPS){
+          minMeasuredFPS = instFPS;
+        }
+
+        if(instFPS > maxMeasuredFPS){
+            maxMeasuredFPS = instFPS;
+        }
+
+        avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
+        minFpsElem.innerHTML = minMeasuredFPS;
+        maxFpsElem.innerHTML = maxMeasuredFPS;
       }
       
-      avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
-      minFpsElem.innerHTML = minMeasuredFPS;
-      maxFpsElem.innerHTML = maxMeasuredFPS;
-    }
-
-    fpsElem.innerHTML = instFPS;
-
-//    // Disabled below code to be able to run reproducible benchmarks
-//    // If we are running > 40hz then turn on a few more options.
-//    if (setPretty && g_fpsTimer.averageFPS > 40) {
-//      setPretty = false;
-//      if (!g.options.normalMaps.enabled) { g.options.normalMaps.toggle(); }
-//      if (!g.options.reflection.enabled) { g.options.reflection.toggle(); }
-//    }
-// 
-//    // See if we should increase/decrease the rendering resolution
-//    checkResTimer -= elapsedTime;
-//    if (checkResTimer < 0) {
-//      if (g.win && g.win.adjustRes) {
-//        if (g_fpsTimer.averageFPS > 35) {
-//          if (increaseCanvasSize(canvas)) {
-//            checkResTimer = 2;
-//          }
-//        } else if (g_fpsTimer.averageFPS < 15) {
-//          if (decreaseCanvasSize(canvas)) {
-//            checkResTimer = 2;
-//          }
-//        }
-//      }
-//    }
-
-    if(frameCount % 300 == 0){
-      console.debug(canvas.width + ' ' + canvas.height);
+      fpsElem.innerHTML = instFPS;
+    } else {
+      fpsElem.innerHTML = "--";
+      g_fishTable.length = 0;
     }
 
     if (g.net.sync) {
@@ -1259,6 +1309,7 @@ function initialize() {
     var height = Math.abs(top - bottom);
     var xOff = width * g.net.offset[0] * g.net.offsetMult;
     var yOff = height * g.net.offset[1] * g.net.offsetMult;
+    
     fast.matrix4.frustum(
       projection,
       left + xOff,
