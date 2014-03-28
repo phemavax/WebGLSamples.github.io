@@ -31,6 +31,7 @@ var g_sceneGroups = {};  // the placement of the models
 var g_fog = true;
 var g_requestId;
 
+// added for benchmarking stuff
 var benchmarkMessageStarting = "Benchmark starts in: ";
 var benchmarkMessageRunning = "Running Benchmark";
 var benchmarkMessageFinished = "Benchmark Finished";
@@ -41,6 +42,8 @@ var minMeasuredFPS = 100000000.0;
 var maxMeasuredFPS = 0.0;
 var lockCanvasSizeToScreen = false;
 var benchmarkIsRunning = true;
+var fishCountSetting = 0;
+var setFishCount = false;
 
 // URL arguments
 // Use: http://localhost/aquarium/aquarium.html?lockRes=false&width=1024&height=720&startWait=3&runFor=10
@@ -798,50 +801,6 @@ function advanceViewSettings() {
   g_viewSettingsIndex = (g_viewSettingsIndex + 1) % g_viewSettings.length;
 }
 
-/**
- * Sets the count
- */
-function setSetting(elem, id) {
-  switch (id) {
-  case 8:
-    break;
-  case 7:
-    advanceViewSettings();
-    break;
-  default:
-    g_numSettingElements[id] = elem;
-    setSettings({globals:{fishSetting:id}});
-    for (var otherElem in g_numSettingElements) {
-      g_numSettingElements[otherElem].style.color = "gray";
-    }
-    elem.style.color = "red";
-  }
-}
-
-/**
- * Sets up the count buttons.
- */
-function setupCountButtons() {
-  for (var ii = 0; ii < 100; ++ii) {
-    var elem = document.getElementById("setSetting" + ii);
-    if (!elem) {
-      break;
-    }
-    g_setSettingElements.push(elem);
-    elem.onclick = function(elem, id) {
-      return function () {
-        setSetting(elem, id);
-      }}(elem, ii);
-  }
-
-  if (g.net.sync) {
-    setSetting(document.getElementById("setSetting4"), 4);
-  } else {
-    setSetting(document.getElementById("setSetting2"), 2);
-  }
-  setSetting(document.getElementById("setSetting7"), 7);
-}
-
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -855,13 +814,14 @@ function setUpParameters(){
   }
   
   function checkFlags(n) {
+    // TODO eval flags
     return false;
   }
   
   var lock = getParameterByName(lockRes);
   if(lock == "true"){
     lockCanvasSizeToScreen = true;
-    Log("Locking render resolution to page element size");
+    Log("Locking render resolution to page size");
   }
  
   var width = getParameterByName(resWidth);
@@ -890,7 +850,27 @@ function setUpParameters(){
   
   var fish = getParameterByName(numFish);
   if(isNumber(fish)){
-    // TODO set number of fish;
+    setFishCount = true;
+    
+    if(fish == 1){
+      fishCountSetting = 0;
+    } else if (fish == 10){
+      fishCountSetting = 1;
+    } else if (fish == 50){
+      fishCountSetting = 2;
+    } else if (fish == 100){
+      fishCountSetting = 3;
+    } else if (fish == 250){
+      fishCountSetting = 4;
+    } else if (fish == 500){
+      fishCountSetting = 5;
+    } else if (fish == 1000){
+      fishCountSetting = 6;
+    } else {
+      setFishCount = false;
+      Log("Invalid fish count " + fish + " using default");
+    
+    }
     Log("Setting number of fish to " + fish);
   }
   
@@ -1197,7 +1177,6 @@ function initialize() {
   }
 
 //   var checkResTimer = 2;
-
 //   if (g.globals.width && g.globals.height) {
 //     setCanvasSize(canvas, g.globals.width, g.globals.height);
 //   }
@@ -1733,6 +1712,26 @@ function initialize() {
 }
 
 /**
+ * Sets the count
+ */
+function setSetting(elem, id) {
+  switch (id) {
+  case 8:
+    break;
+  case 7:
+    advanceViewSettings();
+    break;
+  default:
+    g_numSettingElements[id] = elem;
+    setSettings({globals:{fishSetting:id}});
+    for (var otherElem in g_numSettingElements) {
+      g_numSettingElements[otherElem].style.color = "gray";
+    }
+    elem.style.color = "red";
+  }
+}
+
+/**
  * Sets up the count buttons.
  */
 function setupCountButtons() {
@@ -1758,6 +1757,10 @@ function setupCountButtons() {
 
 function initUIStuff() {
   setupCountButtons();
+  
+  if(setFishCount){
+    setSetting(document.getElementById("setSetting" + fishCountSetting), fishCountSetting);
+  }
 
   function toggleOption(name, option, elem) {
     var options = { };
