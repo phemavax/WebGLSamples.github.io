@@ -1245,10 +1245,12 @@ function initialize() {
 
         if(instFPS < minMeasuredFPS){
           minMeasuredFPS = instFPS;
+          minFpsElem.innerHTML = minMeasuredFPS;
         }
 
         if(instFPS > maxMeasuredFPS){
             maxMeasuredFPS = instFPS;
+            maxFpsElem.innerHTML = maxMeasuredFPS;
         }
         
         if(lastInstFPS * jankRatio > instFPS){
@@ -1257,8 +1259,6 @@ function initialize() {
         }
 
         avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
-        minFpsElem.innerHTML = minMeasuredFPS;
-        maxFpsElem.innerHTML = maxMeasuredFPS;
       }
       
       fpsElem.innerHTML = instFPS;
