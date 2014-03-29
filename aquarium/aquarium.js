@@ -44,6 +44,10 @@ var lockCanvasSizeToScreen = false;
 var benchmarkIsRunning = true;
 var fishCountSetting = 0;
 var setFishCount = false;
+var lastInstFPS = 0;
+var jankRatio = 0.3;
+var jankCount = 0;
+
 
 // URL arguments
 // Use: http://localhost/aquarium/aquarium.html?lockRes=false&width=1024&height=720&startWait=3&runFor=10
@@ -960,6 +964,7 @@ function initialize() {
   var benchMessage = document.getElementById("benchMessage");
   var canWidthElem = document.getElementById("canWidth");
   var canHeightElem = document.getElementById("canHeight");
+  var jankCountElem = document.getElementById("jankCount");
 
   var projection = new Float32Array(16);
   var view = new Float32Array(16);
@@ -1211,11 +1216,12 @@ function initialize() {
         avgFpsElem.innerHTML = "--";
         minFpsElem.innerHTML = "--";
         maxFpsElem.innerHTML = "--";
+        jankCountElem.innerHTML = "--";
       }else{
         if(startupTimeElapsed){
           if(benchmarkRunTime > 0 ){
             if(benchmarkRunTime > runningTime){
-              benchMessage.innerHTML = benchmarkMessageRunning + ": " + Math.floor(benchmarkRunTime - runningTime + 1);
+              benchMessage.innerHTML = benchmarkMessageRunning + ": " + Math.ceil(benchmarkRunTime - runningTime);
             } else {
               benchmarkIsRunning = false;
               benchMessage.innerHTML = benchmarkMessageFinished;
@@ -1233,6 +1239,8 @@ function initialize() {
           } else {
             benchMessage.innerHTML = benchmarkMessageRunning;
           }
+          
+          jankCountElem.innerHTML = jankCount;
         }
 
         if(instFPS < minMeasuredFPS){
@@ -1242,6 +1250,11 @@ function initialize() {
         if(instFPS > maxMeasuredFPS){
             maxMeasuredFPS = instFPS;
         }
+        
+        if(lastInstFPS * jankRatio > instFPS){
+          jankCount++;
+          jankCountElem.innerHTML = jankCount;
+        }
 
         avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
         minFpsElem.innerHTML = minMeasuredFPS;
@@ -1249,6 +1262,7 @@ function initialize() {
       }
       
       fpsElem.innerHTML = instFPS;
+      lastInstFPS = instFPS;
     } else {
       fpsElem.innerHTML = "--";
       g_fishTable.length = 0;
