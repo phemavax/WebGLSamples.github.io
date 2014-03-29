@@ -1241,6 +1241,7 @@ function initialize() {
           }
           
           jankCountElem.innerHTML = jankCount;
+          $('#topUI').toggle();
         }
 
         if(instFPS < minMeasuredFPS){
