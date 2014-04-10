@@ -891,18 +891,24 @@ function setUpParameters(){
       fishCountSetting = 5;
     } else if (fish == 1000){
       fishCountSetting = 6;
+    } else if (fish == 2000){
+      fishCountSetting = 7;
+    } else if (fish == 4000){
+      fishCountSetting = 8;
     } else {
       setFishCount = false;
-      Log("Invalid fish count " + fish + " using default");
+      Log("Invalid fish count " + fish + ". Using default");
     
     }
-    Log("Setting number of fish to " + fish);
+    if(setFishCount){
+      Log("Setting number of fish to " + fish);
+    }
   }
   
-  var params = getParameterByName(numFish);
+  var params = getParameterByName(featureFlags);
   if(checkFlags(params)){
     // TODO set flags;
-    Log("Setting number of fish to " + fish);
+    Log("Feature Flags not supported yet!");
   }
 }
 
