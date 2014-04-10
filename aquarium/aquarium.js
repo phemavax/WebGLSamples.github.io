@@ -130,7 +130,7 @@ var g_netUI = [
 var g_fishTable = [
   {
     name: 'SmallFishA',
-    num: [0, 3, 36, 76, 206, 500, 1000, 50],
+    num: [0, 3, 36, 76, 206, 500-40-40-2-2, 1000-80-80-2-2, 2000-80-80-2-2, 4000-80-80-2-2, 50],
     speed: 1,
     speedRange: 1.5,
     radius: 30,
@@ -146,7 +146,7 @@ var g_fishTable = [
   },
   {
     name: 'MediumFishA',
-    num: [0, 3, 6, 10, 20, 0, 0, 10],
+    num: [0, 3, 6, 10, 20, 40, 80, 80, 80, 10],
     speed: 1,
     speedRange: 2,
     radius: 10,
@@ -162,7 +162,7 @@ var g_fishTable = [
   },
   {
     name: 'MediumFishB',
-    num: [0, 2, 6, 10, 20, 0, 0, 10],
+    num: [0, 2, 6, 10, 20, 40, 80, 80, 80, 10],
     speed: 0.5,
     speedRange: 4,
     radius: 10,
@@ -178,7 +178,7 @@ var g_fishTable = [
   },
   {
     name: 'BigFishA',
-    num: [1, 1, 1, 2, 2, 0, 0, 3],
+    num: [1, 1, 1, 2, 2, 2, 2, 2, 2, 3],
     speed: 0.5,
     speedRange: 0.5,
     radius: 50,
@@ -198,7 +198,7 @@ var g_fishTable = [
   },
   {
     name: 'BigFishB',
-    num: [0, 1, 1, 2, 2, 0, 0, 1],
+    num: [0, 1, 1, 2, 2, 2, 2, 2, 2, 1],
     speed: 0.5,
     speedRange: 0.5,
     radius: 45,
@@ -628,6 +628,7 @@ function setShaders() {
   }
 }
 
+
 function loadScene(name, opt_programIds, fog) {
   var scene = new Scene(opt_programIds, fog);
   scene.load("assets/" + name + ".js");
@@ -803,6 +804,26 @@ function setViewSettings(index) {
 function advanceViewSettings() {
   setViewSettings(g_viewSettingsIndex);
   g_viewSettingsIndex = (g_viewSettingsIndex + 1) % g_viewSettings.length;
+}
+
+/**
+ * Sets the count
+ */
+function setSetting(elem, id) {
+  switch (id) {
+  case 10:
+    break;
+  case 9:
+    advanceViewSettings();
+    break;
+  default:
+    g_numSettingElements[id] = elem;
+    setSettings({globals:{fishSetting:id}});
+    for (var otherElem in g_numSettingElements) {
+      g_numSettingElements[otherElem].style.color = "gray";
+    }
+    elem.style.color = "red";
+  }
 }
 
 function getParameterByName(name) {
@@ -1303,7 +1324,6 @@ function initialize() {
     var height = Math.abs(top - bottom);
     var xOff = width * g.net.offset[0] * g.net.offsetMult;
     var yOff = height * g.net.offset[1] * g.net.offsetMult;
-    
     fast.matrix4.frustum(
       projection,
       left + xOff,
@@ -1722,28 +1742,8 @@ function initialize() {
       g_requestId = tdl.webgl.requestAnimationFrame(render, canvas);
     }
   }
- render();
+  render();
   return true;
-}
-
-/**
- * Sets the count
- */
-function setSetting(elem, id) {
-  switch (id) {
-  case 8:
-    break;
-  case 7:
-    advanceViewSettings();
-    break;
-  default:
-    g_numSettingElements[id] = elem;
-    setSettings({globals:{fishSetting:id}});
-    for (var otherElem in g_numSettingElements) {
-      g_numSettingElements[otherElem].style.color = "gray";
-    }
-    elem.style.color = "red";
-  }
 }
 
 /**
@@ -1767,7 +1767,7 @@ function setupCountButtons() {
   } else {
     setSetting(document.getElementById("setSetting2"), 2);
   }
-  setSetting(document.getElementById("setSetting7"), 7);
+  setSetting(document.getElementById("setSetting9"), 9);
 }
 
 function initUIStuff() {
@@ -1852,7 +1852,7 @@ $(function(){
     g.net.fovFudge = 1;
   }
 
-  $('#setSetting8').click(function() {
+  $('#setSetting10').click(function() {
       $("#uiContainer").toggle('slow'); return false; });
   $("#uiContainer").toggle();
   $('#options').click(function() {
