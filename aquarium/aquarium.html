@@ -56,6 +56,74 @@ a {
   	text-align: center;
   	z-index: 2;
 }
+#helpContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+#benchHelp {
+  color: red;
+}
+
+#help {
+  position: relative;
+  font-size: medium;
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 10px;
+  width: 50%;
+  margin: 0 auto;
+  top: 10%;
+}
+#helpTitle{
+  position: relative;
+  width: 100%;
+  font-weight: bold;
+  font-size: medium;
+  text-align: center;
+  padding: 4px 0px 4px 0px;
+  margin: 0 0 5px 0;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 10px 10px 0 0;
+}
+#helpExample{
+  position: relative;
+  width: 100%;
+  font-size: medium;
+    margin: 5px 0 0 0;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 0 0 10px 10px;
+}
+.helpArg {
+  padding: 5px;
+  color: red;
+  font-weight: bold;
+  text-shadow: 1px 1px #000000;
+  font-size: medium;
+  position: relative
+}
+.argDesc {
+  color: white;
+  padding-left: 10px;
+  font-weight: normal;
+  text-shadow: 0px 0px #000000;
+}
+.helpText {
+  padding: 5px;
+  color: grey;
+  font-weight: bold;
+  font-size: medium;
+  position: relative
+}
+.helpExample {
+  color: white;
+  padding-left: 10px;
+  font-weight: normal;
+}
 canvas {
   background-color: gray;
 }
@@ -80,6 +148,7 @@ canvas {
 .benchmark{
   color: red;
   font-size: medium;
+  text-shadow: 1px 1px #000000;
 /*  border-bottom-color: rgba(0,0,0,0.5);
   border-bottom-style: solid;
   border-bottom-width: 1px;*/
@@ -134,6 +203,25 @@ canvas {
 </head>
 <body>
 <div id="info"><a href="http://threedlibrary.googlecode.com" target="_blank">tdl.js</a> - aquarium</div>
+<div id="helpContainer">
+  <div id="help">
+    <div id="helpTitle">Benchmark Help</div>
+    <div class="helpArg">lockRes<span class="argDesc">(true/false) locks the frame buffer resolution to the window resolution. Normally this defaults to 1024x1024 and the browser scales it to fit the page</span></div>
+    <div class="helpArg">width<span class="argDesc">sets the width of the frame buffer</span></div>
+    <div class="helpArg">height<span class="argDesc">sets the height of the frame buffer</span></div>
+    <div class="helpArg">startWait<span class="argDesc">the delay in seconds before the benchmark begins. Default is 15 seconds</span></div>
+    <div class="helpArg">runFor<span class="argDesc">the duration that the benchmark will run and collect data. The timer starts after startWiat elapses. When the benchmark timer elapses, the recorded values are frozen and fish count is set to 0. Not setting runFor will run the benchmark indefinitely</span></div>
+    <div class="helpArg">startWait<span class="argDesc">The time in seconds...</span></div>
+    <div class="helpArg">numFish<span class="argDesc">sets the number of fish. Values must equal the number settings in the IU, i.e. 1, 10, 50, etc.</span></div>
+    <div class="helpArg">featureFlags<span class="argDesc">NOT IMPLEMENTED - it can be added if needed. This option would allow the user to set the options flags under the “Options…” UI menu with a bit string e.g. ‘0001111’</span></div>
+    <div id="helpExample">
+      <div class="helpText">URL to start a 60 second benchmark with a custom resolution and 100 fish:
+      <span class="helpExample">aquarium.html?width=1024&height=720&startWait=10&runFor=60&numFish=100</span></div>
+      <div class="helpText">Run a benchmark forever with native resolution, and everything else default:
+      <span class="helpExample">aquarium.html?lockRes=true</span></div>
+    </div>
+  </div>
+</div>
 <div class="fpsContainer">
   <div class="fpsContainerBlock">
   <div class="benchmark"><span id="benchMessage"></div>
@@ -167,6 +255,10 @@ canvas {
   <div id="optionsContainer">
   </div>
   </div>
+  
+  <div class="clickable" id="benchHelp">Benchmark Help...
+  </div>
+  
   </div>
   </div>
 </div>

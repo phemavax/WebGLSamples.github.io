@@ -35,7 +35,7 @@ var g_requestId;
 var benchmarkMessageStarting = "Benchmark starts in: ";
 var benchmarkMessageRunning = "Running Benchmark";
 var benchmarkMessageFinished = "Benchmark Finished";
-var secondsBeforeStartMeasure = 5.0;
+var secondsBeforeStartMeasure = 15.0;
 var benchmarkRunTime = -1;
 var startupTimeElapsed = false;
 var minMeasuredFPS = 100000000.0;
@@ -47,7 +47,7 @@ var setFishCount = false;
 var lastInstFPS = 0;
 var jankRatio = 0.3;
 var jankCount = 0;
-
+var pauseTimer = false;
 
 // URL arguments
 // Use: http://localhost/aquarium/aquarium.html?lockRes=false&width=1024&height=720&startWait=3&runFor=10
@@ -1231,10 +1231,14 @@ function initialize() {
 
     g_fpsTimer.update(elapsedTime);
     
-    then = now;
+    then = now;    
     runningTime = now - startTime;
     instFPS = g_fpsTimer.instantaneousFPS;
     frameCount++;
+    
+    if(pauseTimer){
+      startTime += elapsedTime;
+    }
     
     if(benchmarkIsRunning){
       if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
@@ -1268,7 +1272,9 @@ function initialize() {
           }
           
           jankCountElem.innerHTML = jankCount;
-          $('#topUI').toggle();
+
+          document.getElementById("topUI").style.display = "none";
+          document.getElementById("helpContainer").style.display = "none";
         }
 
         if(instFPS < minMeasuredFPS){
@@ -1864,6 +1870,16 @@ $(function(){
   $('#options').click(function() {
       $("#optionsContainer").toggle(); return false; });
   $("#optionsContainer").toggle();
+  
+  $('#benchHelp').click(function() {
+      pauseTimer = !pauseTimer;
+      if(pauseTimer) {
+          document.getElementById("helpContainer").style.display = "block";
+      } else {
+          document.getElementById("helpContainer").style.display = "none";  
+      }
+      return false;
+      });
 
   if (g.net.ui === false) {
     $('#topUI').hide();
