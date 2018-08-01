@@ -966,6 +966,17 @@ function initialize() {
   if (g_query.numFish) {
     g_numFish[0] = parseInt(g_query.numFish);
   }
+  if (g_query.canvasWidth) {
+    g.globals.width = parseInt(g_query.canvasWidth);
+  }
+  if (g_query.canvasHeight) {
+    g.globals.height = parseInt(g_query.canvasHeight);
+  }
+  if (g_query.fitWindow == "true") {
+    g.globals.fitWindow = true;
+  } else if (g_query.fitWindow == "false") {
+    g.globals.fitWindow = false;
+  }
 
   gl.enable(gl.DEPTH_TEST);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -1243,6 +1254,11 @@ function initialize() {
       tdl.log("new canvas height:", newHeight);
     }
     if (changed) {
+      var widthElem = document.getElementById("canvasWidth");
+      widthElem.innerHTML = canvas.width;
+      var heightElem = document.getElementById("canvasHeight");
+      heightElem.innerHTML = canvas.height;
+
       //tdl.log("drawingBufferDimensions:" + gl.drawingBufferWidth + ", " + gl.drawingBufferHeight);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -1345,6 +1361,10 @@ function initialize() {
     } else {
       fpsElem.innerHTML = "--";
       g_fishTable.length = 0;
+    }
+
+    if (g.globals.fitWindow) {
+      setCanvasSize(canvas, canvas.clientWidth, canvas.clientHeight);
     }
 
     if (g.net.sync) {
@@ -1829,6 +1849,11 @@ function setupCountButtons() {
 }
 
 function initUIStuff() {
+  var widthElem = document.getElementById("canvasWidth");
+  widthElem.innerHTML = canvas.width;
+  var heightElem = document.getElementById("canvasHeight");
+  heightElem.innerHTML = canvas.height;
+
   setupCountButtons();
   var elem = document.getElementById("setSettingChangeView");
   elem.onclick = function() {
