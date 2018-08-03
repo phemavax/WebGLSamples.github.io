@@ -275,10 +275,11 @@ canvas {
 attribute vec4 position;
 attribute vec2 texCoord;
 varying vec2 v_texCoord;
-uniform mat4 worldViewProjection;
+uniform mat4 world;
+uniform mat4 viewProjection;
 void main() {
   v_texCoord = texCoord;
-  gl_Position = (worldViewProjection * position);
+  gl_Position = (viewProjection * world * position);
 }
 </script>
 <script id="texFragmentShader" type="text/something-not-javascript">
@@ -296,10 +297,11 @@ void main() {
 attribute vec4 position;
 attribute vec2 texCoord;
 varying vec2 v_texCoord;
-uniform mat4 worldViewProjection;
+uniform mat4 world;
+uniform mat4 viewProjection;
 void main() {
   v_texCoord = texCoord;
-  gl_Position = (worldViewProjection * position);
+  gl_Position = (viewProjection * world * position);
 }
 </script>
 <script id="laserFragmentShader" type="text/something-not-javascript">
@@ -351,7 +353,6 @@ void main() {
     vec4(0, 0, scale, 0),
     vec4(0, 0, 0, 1));
   mat4 world = orientMat * scaleMat;
-  mat4 worldViewProjection = viewProjection * world;
   mat4 worldInverseTranspose = world;
 
   v_texCoord = texCoord;
@@ -363,7 +364,7 @@ void main() {
   float a = sign(s);
   float offset = pow(mult, 2.0) * s * fishBendAmount;
   v_position = (
-      worldViewProjection *
+      viewProjection * world *
       (position +
        vec4(offset, 0, 0, 0)));
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
@@ -569,7 +570,7 @@ void main() {
 </script>
 <!-- ===[ Diffuse Map Shader ]============================================== -->
 <script id="diffuseVertexShader" type="text/something-not-javascript">
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
@@ -584,7 +585,7 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 void main() {
   v_texCoord = texCoord;
-  v_position = (worldViewProjection * position);
+  v_position = (viewProjection * world * position);
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (world * position).xyz;
   v_surfaceToView = (viewInverse[3] - (world * position)).xyz;
@@ -632,7 +633,7 @@ void main() {
 </script>
 <!-- ===[ Normal Map Shader ]============================================== -->
 <script id="normalMapVertexShader" type="text/something-not-javascript">
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
@@ -651,7 +652,7 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 void main() {
   v_texCoord = texCoord;
-  v_position = (worldViewProjection * position);
+  v_position = (viewProjection * world * position);
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (world * position).xyz;
   v_surfaceToView = (viewInverse[3] - (world * position)).xyz;
@@ -713,7 +714,7 @@ void main() {
 </script>
 <!-- ===[ Reflection Map Shader ]============================================== -->
 <script id="reflectionMapVertexShader" type="text/something-not-javascript">
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
@@ -732,7 +733,7 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 void main() {
   v_texCoord = texCoord;
-  v_position = (worldViewProjection * position);
+  v_position = (viewProjection * world * position);
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (world * position).xyz;
   v_surfaceToView = (viewInverse[3] - (world * position)).xyz;
@@ -797,7 +798,7 @@ void main() {
 </script>
 <!-- ===[ Inner Refraction Map Shader ]==================================== -->
 <script id="innerRefractionMapVertexShader" type="text/something-not-javascript">
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
@@ -816,7 +817,7 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 void main() {
   v_texCoord = texCoord;
-  v_position = (worldViewProjection * position);
+  v_position = (viewProjection * world * position);
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (world * position).xyz;
   v_surfaceToView = (viewInverse[3] - (world * position)).xyz;
@@ -891,7 +892,7 @@ void main() {
 </script>
 <!-- ===[ Outer Refraction Map Shader ]==================================== -->
 <script id="outerRefractionMapVertexShader" type="text/something-not-javascript">
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
@@ -910,7 +911,7 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 void main() {
   v_texCoord = texCoord;
-  v_position = (worldViewProjection * position);
+  v_position = (viewProjection * world * position);
   v_normal = (worldInverseTranspose * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (world * position).xyz;
   v_surfaceToView = (viewInverse[3] - (world * position)).xyz;
