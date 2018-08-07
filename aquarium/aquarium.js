@@ -1057,7 +1057,6 @@ function initialize() {
   var viewProjection = new Float32Array(16);
   var worldViewProjection = new Float32Array(16);
   var viewInverse = new Float32Array(16);
-  var viewProjectionInverse = new Float32Array(16);
   var skyView = new Float32Array(16);
   var skyViewProjection = new Float32Array(16);
   var skyViewProjectionInverse = new Float32Array(16);
@@ -1080,20 +1079,6 @@ function initialize() {
   // Sky uniforms.
   var skyConst = {viewProjectionInverse: skyViewProjectionInverse};
   var skyPer = {};
-
-  // Sand uniforms.
-  var sandConst = {
-    viewInverse: viewInverse,
-    lightWorldPos: lightWorldPos,
-    lightColor: one4,
-    specular: one4,
-    shininess: 5,
-    specularFactor: 0.3};
-  var sandPer = {
-    world: world,
-    worldViewProjection: worldViewProjection,
-    worldInverse: worldInverse,
-    worldInverseTranspose: worldInverseTranspose};
 
   // Generic uniforms.
   var genericConst = {
@@ -1426,7 +1411,6 @@ function initialize() {
     }
     fast.matrix4.inverse(view, viewInverse);
     fast.matrix4.mul(viewProjection, view, projection);
-    fast.matrix4.inverse(viewProjectionInverse, viewProjection);
 
     fast.matrix4.copy(skyView, view);
     skyView[12] = 0;
