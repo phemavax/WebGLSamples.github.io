@@ -130,7 +130,7 @@ var g_netUI = [
 var g_fishTable = [
   {
     name: 'SmallFishA',
-    num: [0, 3, 36, 76, 206, 500-40-40-2-2, 1000-80-80-2-2, 2000-80-80-2-2, 4000-80-80-2-2, 50],
+    num: [76, 1000-80-80-2-2, 3000-80-80-2-2, 4000-80-80-2-2, 5000-80-80-2-2, 10000-160-160-2-2, 20000-160-160-2-2 , 30000-160-160-2-2, 40000-160-160-2-2, 50],
     speed: 1,
     speedRange: 1.5,
     radius: 30,
@@ -146,7 +146,7 @@ var g_fishTable = [
   },
   {
     name: 'MediumFishA',
-    num: [0, 3, 6, 10, 20, 40, 80, 80, 80, 10],
+    num: [10, 80, 80, 80, 80, 160, 160, 160, 160, 10],
     speed: 1,
     speedRange: 2,
     radius: 10,
@@ -162,7 +162,7 @@ var g_fishTable = [
   },
   {
     name: 'MediumFishB',
-    num: [0, 2, 6, 10, 20, 40, 80, 80, 80, 10],
+    num: [10, 80, 80, 80, 80, 160, 160, 160, 160, 10],
     speed: 0.5,
     speedRange: 4,
     radius: 10,
@@ -178,7 +178,7 @@ var g_fishTable = [
   },
   {
     name: 'BigFishA',
-    num: [1, 1, 1, 2, 2, 2, 2, 2, 2, 3],
+    num: [2, 2, 2, 2, 2, 2, 2, 2, 2, 3],
     speed: 0.5,
     speedRange: 0.5,
     radius: 50,
@@ -198,7 +198,7 @@ var g_fishTable = [
   },
   {
     name: 'BigFishB',
-    num: [0, 1, 1, 2, 2, 2, 2, 2, 2, 1],
+    num: [2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
     speed: 0.5,
     speedRange: 0.5,
     radius: 45,
@@ -837,74 +837,74 @@ function setUpParameters(){
   function isNumber(n) {
     return !isNaN(parseInt(n)) && isFinite(n) && n > 0;
   }
-  
+
   function checkFlags(n) {
     // TODO eval flags
     return false;
   }
-  
+
   var lock = getParameterByName(lockRes);
   if(lock == "true"){
     lockCanvasSizeToScreen = true;
     Log("Locking render resolution to page size");
   }
- 
+
   var width = getParameterByName(resWidth);
   if(isNumber(width)){
     canvas.width = parseInt(width);
     Log("Setting render width to " + width);
   }
-  
+
   var height = getParameterByName(resHeight);
   if(isNumber(height)){
     canvas.height = parseInt(height);
     Log("Setting render height to " + height);
   }
-  
+
   var delay = getParameterByName(startWait);
   if(isNumber(delay)){
     secondsBeforeStartMeasure = parseInt(delay);
     Log("Setting benchmark start delay to " + delay + " seconds");
   }
-  
+
   var dur = getParameterByName(benchRunTime);
   if(isNumber(dur)){
     benchmarkRunTime = parseFloat(dur);
     Log("Setting benchmark runtime to " + dur + " seconds");
   }
-  
+
   var fish = getParameterByName(numFish);
   if(isNumber(fish)){
     setFishCount = true;
-    
-    if(fish == 1){
+
+    if(fish == 100){
       fishCountSetting = 0;
-    } else if (fish == 10){
-      fishCountSetting = 1;
-    } else if (fish == 50){
-      fishCountSetting = 2;
-    } else if (fish == 100){
-      fishCountSetting = 3;
-    } else if (fish == 250){
-      fishCountSetting = 4;
-    } else if (fish == 500){
-      fishCountSetting = 5;
     } else if (fish == 1000){
-      fishCountSetting = 6;
-    } else if (fish == 2000){
-      fishCountSetting = 7;
+      fishCountSetting = 1;
+    } else if (fish == 3000){
+      fishCountSetting = 2;
     } else if (fish == 4000){
+      fishCountSetting = 3;
+    } else if (fish == 5000){
+      fishCountSetting = 4;
+    } else if (fish == 10000){
+      fishCountSetting = 5;
+    } else if (fish == 20000){
+      fishCountSetting = 6;
+    } else if (fish == 30000){
+      fishCountSetting = 7;
+    } else if (fish == 40000){
       fishCountSetting = 8;
     } else {
       setFishCount = false;
       Log("Invalid fish count " + fish + ". Using default");
-    
+
     }
     if(setFishCount){
       Log("Setting number of fish to " + fish);
     }
   }
-  
+
   var params = getParameterByName(featureFlags);
   if(checkFlags(params)){
     // TODO set flags;
@@ -919,7 +919,7 @@ function main() {
   math = tdl.math;
   fast = tdl.fast;
   canvas = document.getElementById("canvas");
-  
+
   setUpParameters();
 
   //canvas = WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas);
@@ -1172,15 +1172,15 @@ function initialize() {
 
   var theClock = tdl.clock.createClock(g.net.sync ? 10 : undefined);
   var startTime = theClock.getTime();
-  
+
   var now = theClock.getTime();
   if (g.net.sync) {
     clock = now;
     eyeClock = now;
   }
-  
+
   canWidthElem.innerHTML = canvas.width;
-  canHeightElem.innerHTML = canvas.height; 
+  canHeightElem.innerHTML = canvas.height;
 
   function setCanvasSize(canvas, newWidth, newHeight) {
     var changed = false;
@@ -1200,9 +1200,9 @@ function initialize() {
     if (changed) {
       //tdl.log("drawingBufferDimensions:" + gl.drawingBufferWidth + ", " + gl.drawingBufferHeight);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-      
+
       canWidthElem.innerHTML = canvas.width;
-      canHeightElem.innerHTML = canvas.height; 
+      canHeightElem.innerHTML = canvas.height;
     }
 
     return changed;
@@ -1220,9 +1220,9 @@ function initialize() {
     var instFPS;
 
     if(lockCanvasSizeToScreen){
-      setCanvasSize(canvas, canvas.clientWidth, canvas.clientHeight);  
+      setCanvasSize(canvas, canvas.clientWidth, canvas.clientHeight);
     }
-    
+
     if(then == 0.0) {
       elapsedTime = 0.0;
     } else {
@@ -1230,16 +1230,16 @@ function initialize() {
     }
 
     g_fpsTimer.update(elapsedTime);
-    
-    then = now;    
+
+    then = now;
     runningTime = now - startTime;
     instFPS = g_fpsTimer.instantaneousFPS;
     frameCount++;
-    
+
     if(pauseTimer){
       startTime += elapsedTime;
     }
-    
+
     if(benchmarkIsRunning){
       if(!startupTimeElapsed && runningTime < secondsBeforeStartMeasure){
         benchMessage.innerHTML = benchmarkMessageStarting;
@@ -1256,7 +1256,7 @@ function initialize() {
             } else {
               benchmarkIsRunning = false;
               benchMessage.innerHTML = benchmarkMessageFinished;
-            } 
+            }
           }
         } else {
           startupTimeElapsed = true;
@@ -1264,13 +1264,13 @@ function initialize() {
           frameCount = 0;
           minMeasuredFPS = 100000000.0;
           maxMeasuredFPS = 0.0;
-          
+
           if(benchmarkRunTime > 0 ){
             benchMessage.innerHTML = benchmarkMessageRunning + ": " + benchmarkRunTime;
           } else {
             benchMessage.innerHTML = benchmarkMessageRunning;
           }
-          
+
           jankCountElem.innerHTML = jankCount;
 
           document.getElementById("topUI").style.display = "none";
@@ -1286,7 +1286,7 @@ function initialize() {
             maxMeasuredFPS = instFPS;
             maxFpsElem.innerHTML = maxMeasuredFPS;
         }
-        
+
         if(lastInstFPS * jankRatio > instFPS){
           jankCount++;
           jankCountElem.innerHTML = jankCount;
@@ -1294,7 +1294,7 @@ function initialize() {
 
         avgFpsElem.innerHTML = Math.floor((frameCount/(runningTime)) + 0.5);
       }
-      
+
       fpsElem.innerHTML = instFPS;
       lastInstFPS = instFPS;
     } else {
@@ -1784,7 +1784,7 @@ function setupCountButtons() {
 
 function initUIStuff() {
   setupCountButtons();
-  
+
   if(setFishCount){
     setSetting(document.getElementById("setSetting" + fishCountSetting), fishCountSetting);
   }
@@ -1870,13 +1870,13 @@ $(function(){
   $('#options').click(function() {
       $("#optionsContainer").toggle(); return false; });
   $("#optionsContainer").toggle();
-  
+
   $('#benchHelp').click(function() {
       pauseTimer = !pauseTimer;
       if(pauseTimer) {
           document.getElementById("helpContainer").style.display = "block";
       } else {
-          document.getElementById("helpContainer").style.display = "none";  
+          document.getElementById("helpContainer").style.display = "none";
       }
       return false;
       });
